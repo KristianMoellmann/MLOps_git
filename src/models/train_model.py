@@ -1,10 +1,10 @@
-import torch
-import click
 import pickle
-import matplotlib.pyplot as plt
 
-from torch.utils.data import Dataset, DataLoader
+import click
+import matplotlib.pyplot as plt
+import torch
 from model import MyAwesomeModel
+from torch.utils.data import DataLoader, Dataset
 
 
 class dataset(Dataset):

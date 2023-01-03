@@ -1,9 +1,9 @@
-import torch
-import click
 import pickle
 
-from torch.utils.data import Dataset, DataLoader
+import click
+import torch
 from model import MyAwesomeModel
+from torch.utils.data import DataLoader, Dataset
 
 
 class dataset(Dataset):
