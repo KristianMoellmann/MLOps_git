@@ -1,2 +1,2 @@
 # MLOps_git
-Git exercise for DTU course MLOps 2023
+Git exercise these changes are made locally for DTU course MLOps 2023
