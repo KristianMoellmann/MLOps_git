@@ -1,0 +1,6 @@
+docker run --name predict --rm \
+    -v "$(pwd)"/models/trained_model_docker.pt:/models/trained_model_docker.pt \
+    -v "$(pwd)"/data/processed/test.pickle:/test.pickle \
+    predict:latest \
+    ../../models/trained_model_docker.pt \
+    ../../test.pickle

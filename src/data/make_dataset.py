@@ -17,7 +17,7 @@ def main(input_filepath, output_filepath):
         cleaned data ready to be analyzed (saved in ../processed).
     """
     train = {'images': [], 'labels': []}
-    for i in range(5):
+    for i in range(8):
         imgs = np.load(f"{input_filepath}/train_{i}.npz")['images']
         labels = np.load(f"{input_filepath}/train_{i}.npz")['labels']
         train['images'].append(imgs)

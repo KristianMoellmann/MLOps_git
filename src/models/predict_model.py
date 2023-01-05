@@ -18,11 +18,6 @@ class dataset(Dataset):
         return len(self.data)
 
 
-@click.group()
-def cli():
-    pass
-
-
 @click.command()
 @click.argument('model_filepath', type=click.Path(exists=True))
 @click.argument('test_filepath', type=click.Path(exists=True))
@@ -54,7 +49,5 @@ def evaluate(model_filepath, test_filepath):
     print(f"Test set accuracy {correct / total}")
 
 
-cli.add_command(evaluate)
-
 if __name__ == "__main__":
-    cli()
+    evaluate()

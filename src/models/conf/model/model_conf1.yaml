@@ -1,0 +1,3 @@
+#config.yaml
+hyperparameters:
+  bb_hidden_channels: [64,32,16,8]
