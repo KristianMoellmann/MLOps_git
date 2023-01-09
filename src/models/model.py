@@ -8,7 +8,7 @@ class MyAwesomeModel(LightningModule):
         self.backbone = nn.Sequential(
             nn.Conv2d(1, hidden_channels[0], 3),  # [N, 64, 26]
             nn.LeakyReLU(),
-            nn.Conv2d(hidden_channels[0], hidden_channels[1], 3),  # [N, 32, 24]
+            nn.Conv2d(hidden_channels[1], hidden_channels[1], 3),  # [N, 32, 24]
             nn.LeakyReLU(),
             nn.Conv2d(hidden_channels[1], hidden_channels[2], 3),  # [N, 16, 22]
             nn.LeakyReLU(),
