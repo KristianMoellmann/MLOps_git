@@ -33,8 +33,7 @@ class TestData:
     )
     def test_train(self):
         train_data = load_data(os.path.join(_PATH_DATA, "processed/train.pickle"))
-        assert (len(train_data.data) == 40000), \
-            "Number of training data points should be 40,000"
+        assert (len(train_data.data) == 40000), "Number of training data points should be 40,000"
         assert train_data.data.shape == (
             40000,
             1,
