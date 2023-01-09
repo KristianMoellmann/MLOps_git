@@ -19,8 +19,8 @@ class dataset(Dataset):
 
 
 @click.command()
-@click.argument('model_filepath', type=click.Path(exists=True))
-@click.argument('test_filepath', type=click.Path(exists=True))
+@click.argument("model_filepath", type=click.Path(exists=True))
+@click.argument("test_filepath", type=click.Path(exists=True))
 def evaluate(model_filepath, test_filepath):
     print("Evaluating model")
 
@@ -30,10 +30,10 @@ def evaluate(model_filepath, test_filepath):
     model = model.to(device)
     model.eval()
 
-    with open(test_filepath, 'rb') as handle:
+    with open(test_filepath, "rb") as handle:
         raw_data = pickle.load(handle)
 
-    data = dataset(raw_data['images'], raw_data['labels'])
+    data = dataset(raw_data["images"], raw_data["labels"])
     dataloader = DataLoader(data, batch_size=64)
 
     correct, total = 0, 0

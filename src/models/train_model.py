@@ -1,15 +1,15 @@
-import pickle
-import os
-import torch
-import hydra
-import wandb
 import logging
-log = logging.getLogger(__name__)
+import os
+import pickle
+import hydra
+import torch
 from model import MyAwesomeModel
-from torch.utils.data import DataLoader, Dataset
 from pytorch_lightning import Trainer
-from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
+from pytorch_lightning.callbacks import EarlyStopping, ModelCheckpoint
 from pytorch_lightning.loggers import WandbLogger
+from torch.utils.data import DataLoader, Dataset
+
+log = logging.getLogger(__name__)
 
 
 class dataset(Dataset):
@@ -43,22 +43,26 @@ def train(cfg):
         monitor="train_loss", patience=10, verbose=True, mode="min"
     )
 
-    trainer = Trainer(devices=1,
-                      accelerator='gpu',
-                      max_epochs=training_hparams.hyperparameters.epochs,
-                      limit_train_batches=1.0,
-                      callbacks=[checkpoint_callback, early_stopping_callback],
-                      logger=WandbLogger(project="kristianrm"),
-                      precision=16)
+    trainer = Trainer(
+        devices=1,
+        accelerator="gpu",
+        max_epochs=training_hparams.hyperparameters.epochs,
+        limit_train_batches=1.0,
+        callbacks=[checkpoint_callback, early_stopping_callback],
+        logger=WandbLogger(project="kristianrm"),
+        precision=16,
+    )
 
     device = "cuda" if training_hparams.hyperparameters.cuda else "cpu"
     log.info(f"device: {device}")
 
-    with open(training_hparams.hyperparameters.train_data_path, 'rb') as handle:
+    with open(training_hparams.hyperparameters.train_data_path, "rb") as handle:
         raw_data = pickle.load(handle)
 
-    data = dataset(raw_data['images'], raw_data['labels'])
-    train_loader = DataLoader(data, batch_size=training_hparams.hyperparameters.batch_size)
+    data = dataset(raw_data["images"], raw_data["labels"])
+    train_loader = DataLoader(
+        data, batch_size=training_hparams.hyperparameters.batch_size
+    )
     trainer.fit(model, train_dataloaders=train_loader)
     torch.save(model, f"{os.getcwd()}/trained_model.pt")
 
