@@ -1,7 +1,8 @@
-from torch import nn
+from pytorch_lightning import LightningModule
+import torch
+from torch import nn, optim
 
-
-class MyAwesomeModel(nn.Module):
+class MyAwesomeModel(LightningModule):
     def __init__(self, hidden_channels):
         super().__init__()
         self.backbone = nn.Sequential(
@@ -21,6 +22,25 @@ class MyAwesomeModel(nn.Module):
             nn.Dropout(),
             nn.Linear(128, 10)
         )
+        self.criterion = nn.CrossEntropyLoss()
 
     def forward(self, x):
+        if x.ndim != 4:
+            raise ValueError('Expected input to a 4D tensor')
+        if x.shape[1] != 1 or x.shape[2] != 28 or x.shape[3] != 28:
+            raise ValueError('Expected each sample to have shape [1, 28, 28]')
+
         return self.classifier(self.backbone(x))
+
+    def training_step(self, batch: torch.Tensor, batch_idx: int) -> float:
+        data, target = batch
+        preds = self(data)
+        loss = self.criterion(preds, target)
+        acc = (target == preds.argmax(dim=-1)).float().mean()
+        self.log('train_loss', loss)
+        self.log('train_acc', acc)
+        return loss
+
+    def configure_optimizers(self):
+        optimizer = torch.optim.Adam(self.parameters(), lr=1e-3)
+        return optimizer

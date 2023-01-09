@@ -1,13 +1,15 @@
 import pickle
 import os
-import click
-import matplotlib.pyplot as plt
 import torch
 import hydra
+import wandb
 import logging
 log = logging.getLogger(__name__)
 from model import MyAwesomeModel
 from torch.utils.data import DataLoader, Dataset
+from pytorch_lightning import Trainer
+from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
+from pytorch_lightning.loggers import WandbLogger
 
 
 class dataset(Dataset):
@@ -32,39 +34,33 @@ def train(cfg):
     torch.manual_seed(training_hparams.hyperparameters.seed)
 
     model = MyAwesomeModel(model_hparams.hyperparameters.bb_hidden_channels)
+
+    checkpoint_callback = ModelCheckpoint(
+        dirpath="./models", monitor="train_loss", mode="min"
+    )
+
+    early_stopping_callback = EarlyStopping(
+        monitor="train_loss", patience=10, verbose=True, mode="min"
+    )
+
+    trainer = Trainer(devices=1,
+                      accelerator='gpu',
+                      max_epochs=training_hparams.hyperparameters.epochs,
+                      limit_train_batches=1.0,
+                      callbacks=[checkpoint_callback, early_stopping_callback],
+                      logger=WandbLogger(project="kristianrm"),
+                      precision=16)
+
     device = "cuda" if training_hparams.hyperparameters.cuda else "cpu"
     log.info(f"device: {device}")
-    model = model.to(device)
-    print("DET ER HER", os.getcwd())
+
     with open(training_hparams.hyperparameters.train_data_path, 'rb') as handle:
         raw_data = pickle.load(handle)
 
     data = dataset(raw_data['images'], raw_data['labels'])
-    dataloader = DataLoader(data, batch_size=training_hparams.hyperparameters.batch_size)
-    optimizer = torch.optim.Adam(model.parameters(), lr=training_hparams.hyperparameters.lr)
-    criterion = torch.nn.CrossEntropyLoss()
-
-    n_epoch = training_hparams.hyperparameters.epochs
-    loss_tracker = []
-
-    for epoch in range(n_epoch):
-        running_loss = 0
-        for batch in dataloader:
-            optimizer.zero_grad()
-            x, y = batch
-            preds = model(x.to(device))
-            loss = criterion(preds, y.to(device))
-            loss.backward()
-            optimizer.step()
-            running_loss += loss.item()
-        loss_tracker.append(running_loss/len(dataloader))
-        log.info(f"Epoch {epoch + 1}/{n_epoch}. Loss: {running_loss/len(dataloader)}")
+    train_loader = DataLoader(data, batch_size=training_hparams.hyperparameters.batch_size)
+    trainer.fit(model, train_dataloaders=train_loader)
     torch.save(model, f"{os.getcwd()}/trained_model.pt")
-
-    plt.plot(loss_tracker, '-')
-    plt.xlabel('Training step')
-    plt.ylabel('Training loss')
-    plt.savefig(f"{os.getcwd()}/training_curve.png")
 
 
 if __name__ == "__main__":

@@ -12,5 +12,8 @@ python-dotenv>=0.5.1
 pickle5
 numpy~=1.21.6
 torch~=1.11.0
+torchvision~=0.12.0
 matplotlib~=3.5.2
 setuptools~=49.2.1
+pytorch_lightning~=1.8.3
+pytest~=7.2.0
