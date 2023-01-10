@@ -33,7 +33,7 @@ def train(cfg):
     log.info(training_hparams.hyperparameters.lr)
     torch.manual_seed(training_hparams.hyperparameters.seed)
 
-    model = MyAwesomeModel(model_hparams.hyperparameters.bb_hidden_channels)
+    model = MyAwesomeModel(hidden_channels=model_hparams.hyperparameters.bb_hidden_channels)
 
     checkpoint_callback = ModelCheckpoint(
         dirpath="./models", monitor="train_loss", mode="min"
