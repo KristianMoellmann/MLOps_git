@@ -42,12 +42,12 @@ def train(cfg):
     early_stopping_callback = EarlyStopping(
         monitor="train_loss", patience=10, verbose=True, mode="min"
     )
-
+    accelerator = "gpu" if training_hparams.hyperparameters.cuda else "cpu"
     trainer = Trainer(
         devices=1,
-        accelerator="gpu",
+        accelerator=accelerator,
         max_epochs=training_hparams.hyperparameters.epochs,
-        limit_train_batches=1.0,
+        limit_train_batches=.05,
         callbacks=[checkpoint_callback, early_stopping_callback],
         logger=WandbLogger(project="kristianrm"),
         precision=16,
